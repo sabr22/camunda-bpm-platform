@@ -726,24 +726,26 @@ public class BpmnParse extends Parse {
       String isInterrupting = startEventElement.attribute("isInterrupting");
       boolean interrupting = isInterrupting.equalsIgnoreCase("true") ? true : false;
 
-      startEventActivity.setCancelScope(interrupting);
-      startEventActivity.setConcurrent(!interrupting);
+      ((ActivityImpl)scope).setCancelScope(interrupting);
+      ((ActivityImpl)scope).setConcurrent(!interrupting);
 
       // the scope of the event subscription is the parent of the event
       // subprocess (subscription must be created when parent is initialized)
       ScopeImpl catchingScope = ((ActivityImpl) scope).getParent();
       startEventActivity.setScope(catchingScope);
+      startEventActivity.setMagicScope(scope);
+
+      if (scope.getProperty(PROPERTYNAME_INITIAL) == null) {
+        scope.setProperty(PROPERTYNAME_INITIAL, startEventActivity);
+      } else {
+        addError("multiple start events not supported for subprocess", startEventElement);
+      }
 
       if (errorEventDefinition != null) {
         if(!interrupting) {
           addError("error start event of event subprocess must be interrupting", startEventElement);
         }
-        if (scope.getProperty(PROPERTYNAME_INITIAL) == null) {
-            scope.setProperty(PROPERTYNAME_INITIAL, startEventActivity);
-            parseErrorStartEventDefinition(errorEventDefinition, startEventActivity, catchingScope);
-          } else {
-            addError("multiple start events not supported for subprocess", startEventElement);
-          }
+        parseErrorStartEventDefinition(errorEventDefinition, startEventActivity, catchingScope);
 
       } else if (messageEventDefinition != null) {
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseMessageEventDefinition(messageEventDefinition);

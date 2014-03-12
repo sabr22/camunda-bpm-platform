@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener;
 
 
 /**
@@ -75,6 +76,35 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertEquals(0, createEventSubscriptionQuery().count());
     assertEquals(0, runtimeService.createExecutionQuery().count());
   }
+
+  @Deployment
+  public void testEventSubprocessListenersInvoked() {
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    runtimeService.correlateMessage("message");
+
+    Task taskInEventSubProcess = taskService.createTaskQuery().singleResult();
+    assertEquals("taskInEventSubProcess", taskInEventSubProcess.getTaskDefinitionKey());
+
+    taskService.complete(taskInEventSubProcess.getId());
+
+    List<String> collectedevents = TestExecutionListener.collectedEvents;
+
+    assertEquals("taskInMainFlow-end", collectedevents.get(0));
+    assertEquals("eventSubProcess-start", collectedevents.get(1));
+    assertEquals("startEventInSubprocess-start", collectedevents.get(2));
+    assertEquals("startEventInSubprocess-end", collectedevents.get(3));
+    assertEquals("taskInEventSubProcess-start", collectedevents.get(4));
+    assertEquals("eventSubProcess-end", collectedevents.get(5));
+
+
+
+  }
+
+//  @Deployment
+//  public void testNestedEventSubprocessListenersInvoked() {
+//
+//  }
 
   @Deployment
   public void testNonInterruptingUnderProcessDefinition() {

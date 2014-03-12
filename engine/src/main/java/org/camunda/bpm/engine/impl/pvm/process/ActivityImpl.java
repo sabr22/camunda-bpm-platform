@@ -43,6 +43,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   protected boolean isCancelScope = false;
   protected boolean isConcurrent = false;
   protected PvmScope scope;
+  protected PvmScope magicScope;
 
 
   // Graphical information
@@ -219,6 +220,23 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
   public void setConcurrent(boolean isConcurrent) {
     this.isConcurrent = isConcurrent;
+  }
+
+  /**
+   * @return
+   */
+  public PvmScope getMagicScope() {
+    if(magicScope == null) {
+      return getScope();
+
+    } else {
+
+      return magicScope;
+    }
+  }
+
+  public void setMagicScope(PvmScope magicScope) {
+    this.magicScope = magicScope;
   }
 
 }
