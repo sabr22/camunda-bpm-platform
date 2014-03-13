@@ -43,9 +43,18 @@
         <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
       </bpmn2:endEvent>
       <bpmn2:sequenceFlow id="SequenceFlow_4" name="" sourceRef="taskInEventSubProcess" targetRef="endEventInSubProcess"/>
+      <bpmn2:boundaryEvent id="BoundaryEvent_1" name="" attachedToRef="taskInEventSubProcess">
+        <bpmn2:outgoing>SequenceFlow_5</bpmn2:outgoing>
+        <bpmn2:messageEventDefinition id="_MessageEventDefinition_3" messageRef="Message_2"/>
+      </bpmn2:boundaryEvent>
+      <bpmn2:sequenceFlow id="SequenceFlow_5" name="" sourceRef="BoundaryEvent_1" targetRef="EndEvent_2"/>
+      <bpmn2:endEvent id="EndEvent_2">
+        <bpmn2:incoming>SequenceFlow_5</bpmn2:incoming>
+      </bpmn2:endEvent>
     </bpmn2:subProcess>
   </bpmn2:process>
   <bpmn2:message id="Message_1" name="message"/>
+  <bpmn2:message id="Message_2" name="message2"/>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testProcess">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
@@ -66,10 +75,13 @@
         <di:waypoint xsi:type="dc:Point" x="377.0" y="246.0"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_SubProcess_2" bpmnElement="eventSubProcess" isExpanded="true">
-        <dc:Bounds height="121.0" width="325.0" x="132.0" y="312.0"/>
+        <dc:Bounds height="217.0" width="325.0" x="132.0" y="312.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_3" bpmnElement="startEventInSubProcess">
         <dc:Bounds height="36.0" width="36.0" x="164.0" y="355.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="182.0" y="396.0"/>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="_BPMNShape_UserTask_3" bpmnElement="taskInEventSubProcess">
         <dc:Bounds height="80.0" width="100.0" x="250.0" y="333.0"/>
@@ -77,13 +89,39 @@
       <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="_BPMNShape_StartEvent_3" targetElement="_BPMNShape_UserTask_3">
         <di:waypoint xsi:type="dc:Point" x="200.0" y="373.0"/>
         <di:waypoint xsi:type="dc:Point" x="250.0" y="373.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="6.0" width="6.0" x="222.0" y="373.0"/>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_EndEvent_3" bpmnElement="endEventInSubProcess">
         <dc:Bounds height="36.0" width="36.0" x="400.0" y="355.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="418.0" y="396.0"/>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="SequenceFlow_4" sourceElement="_BPMNShape_UserTask_3" targetElement="_BPMNShape_EndEvent_3">
         <di:waypoint xsi:type="dc:Point" x="350.0" y="373.0"/>
         <di:waypoint xsi:type="dc:Point" x="400.0" y="373.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="6.0" width="6.0" x="372.0" y="373.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_BoundaryEvent_2" bpmnElement="BoundaryEvent_1">
+        <dc:Bounds height="36.0" width="36.0" x="294.0" y="395.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_6" bpmnElement="EndEvent_2">
+        <dc:Bounds height="36.0" width="36.0" x="400.0" y="432.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="418.0" y="473.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_5" bpmnElement="SequenceFlow_5" sourceElement="_BPMNShape_BoundaryEvent_2" targetElement="_BPMNShape_EndEvent_6">
+        <di:waypoint xsi:type="dc:Point" x="312.0" y="431.0"/>
+        <di:waypoint xsi:type="dc:Point" x="312.0" y="450.0"/>
+        <di:waypoint xsi:type="dc:Point" x="400.0" y="450.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="6.0" width="6.0" x="363.0" y="450.0"/>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

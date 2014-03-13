@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -23,6 +21,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener;
+
+import java.util.List;
 
 
 /**
@@ -88,23 +88,155 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
 
     taskService.complete(taskInEventSubProcess.getId());
 
-    List<String> collectedevents = TestExecutionListener.collectedEvents;
-
-    assertEquals("taskInMainFlow-end", collectedevents.get(0));
-    assertEquals("eventSubProcess-start", collectedevents.get(1));
-    assertEquals("startEventInSubprocess-start", collectedevents.get(2));
-    assertEquals("startEventInSubprocess-end", collectedevents.get(3));
-    assertEquals("taskInEventSubProcess-start", collectedevents.get(4));
-    assertEquals("eventSubProcess-end", collectedevents.get(5));
+    List<String> collectedEvents = TestExecutionListener.collectedEvents;
 
 
+    assertEquals("taskInMainFlow-start", collectedEvents.get(0));
+//    assertEquals("taskInMainFlow-end", collectedEvents.get(1));
+    assertEquals("eventSubProcess-start", collectedEvents.get(1));
+    assertEquals("startEventInSubProcess-start", collectedEvents.get(2));
+    assertEquals("startEventInSubProcess-end", collectedEvents.get(3));
+    assertEquals("taskInEventSubProcess-start", collectedEvents.get(4));
+    assertEquals("taskInEventSubProcess-end", collectedEvents.get(5));
+    assertEquals("eventSubProcess-end", collectedEvents.get(6));
+
+//    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").canceled().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("endEventInSubProcess").finished().count());
+//    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
 
   }
 
-//  @Deployment
-//  public void testNestedEventSubprocessListenersInvoked() {
-//
-//  }
+  @Deployment
+  public void testNonInterruptingEventSubprocessListenersInvoked() {
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    runtimeService.correlateMessage("message");
+
+    Task taskInMainFlow = taskService.createTaskQuery().taskDefinitionKey("taskInMainFlow").singleResult();
+    assertNotNull(taskInMainFlow);
+
+    Task taskInEventSubProcess = taskService.createTaskQuery().taskDefinitionKey("taskInEventSubProcess").singleResult();
+    assertNotNull(taskInEventSubProcess);
+
+    taskService.complete(taskInMainFlow.getId());
+    taskService.complete(taskInEventSubProcess.getId());
+
+    List<String> collectedEvents = TestExecutionListener.collectedEvents;
+
+    assertEquals("taskInMainFlow-start", collectedEvents.get(0));
+    assertEquals("eventSubProcess-start", collectedEvents.get(1));
+    assertEquals("startEventInSubProcess-start", collectedEvents.get(2));
+    assertEquals("startEventInSubProcess-end", collectedEvents.get(3));
+    assertEquals("taskInEventSubProcess-start", collectedEvents.get(4));
+    assertEquals("taskInMainFlow-end", collectedEvents.get(5));
+    assertEquals("taskInEventSubProcess-end", collectedEvents.get(6));
+    assertEquals("eventSubProcess-end", collectedEvents.get(7));
+
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").finished().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("endEventInSubProcess").finished().count());
+//    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
+
+  }
+
+  @Deployment
+  public void testNestedEventSubprocessListenersInvoked() {
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    runtimeService.correlateMessage("message");
+
+    Task taskInEventSubProcess = taskService.createTaskQuery().singleResult();
+    assertEquals("taskInEventSubProcess", taskInEventSubProcess.getTaskDefinitionKey());
+
+    taskService.complete(taskInEventSubProcess.getId());
+
+    List<String> collectedEvents = TestExecutionListener.collectedEvents;
+
+    assertEquals("taskInMainFlow-start", collectedEvents.get(0));
+//    assertEquals("taskInMainFlow-end", collectedEvents.get(1));
+    assertEquals("eventSubProcess-start", collectedEvents.get(1));
+    assertEquals("startEventInSubProcess-start", collectedEvents.get(2));
+    assertEquals("startEventInSubProcess-end", collectedEvents.get(3));
+    assertEquals("taskInEventSubProcess-start", collectedEvents.get(4));
+    assertEquals("taskInEventSubProcess-end", collectedEvents.get(5));
+    assertEquals("eventSubProcess-end", collectedEvents.get(6));
+
+//    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").canceled().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("endEventInSubProcess").finished().count());
+//    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("subProcess").finished().count());
+
+  }
+
+  @Deployment
+  public void testNestedNonInterruptingEventSubprocessListenersInvoked() {
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    runtimeService.correlateMessage("message");
+
+    Task taskInMainFlow = taskService.createTaskQuery().taskDefinitionKey("taskInMainFlow").singleResult();
+    assertNotNull(taskInMainFlow);
+
+    Task taskInEventSubProcess = taskService.createTaskQuery().taskDefinitionKey("taskInEventSubProcess").singleResult();
+    assertNotNull(taskInEventSubProcess);
+
+    taskService.complete(taskInMainFlow.getId());
+    taskService.complete(taskInEventSubProcess.getId());
+
+    List<String> collectedEvents = TestExecutionListener.collectedEvents;
+
+    assertEquals("taskInMainFlow-start", collectedEvents.get(0));
+    assertEquals("eventSubProcess-start", collectedEvents.get(1));
+    assertEquals("startEventInSubProcess-start", collectedEvents.get(2));
+    assertEquals("startEventInSubProcess-end", collectedEvents.get(3));
+    assertEquals("taskInEventSubProcess-start", collectedEvents.get(4));
+    assertEquals("taskInMainFlow-end", collectedEvents.get(5));
+    assertEquals("taskInEventSubProcess-end", collectedEvents.get(6));
+    assertEquals("eventSubProcess-end", collectedEvents.get(7));
+
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").finished().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").finished().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("endEventInSubProcess").finished().count());
+//    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("subProcess").finished().count());
+
+  }
+
+  @Deployment
+  public void testEventSubprocessBoundaryListenersInvoked() {
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    runtimeService.correlateMessage("message");
+
+    Task taskInEventSubProcess = taskService.createTaskQuery().singleResult();
+    assertEquals("taskInEventSubProcess", taskInEventSubProcess.getTaskDefinitionKey());
+
+    runtimeService.correlateMessage("message2");
+
+    List<String> collectedEvents = TestExecutionListener.collectedEvents;
+
+
+    assertEquals("taskInMainFlow-start", collectedEvents.get(0));
+//    assertEquals("taskInMainFlow-end", collectedEvents.get(1));
+    assertEquals("eventSubProcess-start", collectedEvents.get(1));
+    assertEquals("startEventInSubProcess-start", collectedEvents.get(2));
+    assertEquals("startEventInSubProcess-end", collectedEvents.get(3));
+    assertEquals("taskInEventSubProcess-start", collectedEvents.get(4));
+    assertEquals("taskInEventSubProcess-end", collectedEvents.get(5));
+    assertEquals("eventSubProcess-end", collectedEvents.get(6));
+
+//    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInMainFlow").canceled().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("startEventInSubProcess").finished().count());
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("taskInEventSubProcess").canceled().count());
+//    assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("eventSubProcess").finished().count());
+
+  }
 
   @Deployment
   public void testNonInterruptingUnderProcessDefinition() {

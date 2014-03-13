@@ -22,7 +22,7 @@
         <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener" event="start"/>
         <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener" event="end"/>
       </bpmn2:extensionElements>
-      <bpmn2:startEvent id="startEventInSubProcess">
+      <bpmn2:startEvent id="startEventInSubProcess" isInterrupting="false">
         <bpmn2:extensionElements>
           <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener" event="start"/>
           <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.event.message.util.TestExecutionListener" event="end"/>
