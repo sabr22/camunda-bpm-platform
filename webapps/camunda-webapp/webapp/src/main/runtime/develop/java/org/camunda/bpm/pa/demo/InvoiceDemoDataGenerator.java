@@ -106,6 +106,20 @@ public class InvoiceDemoDataGenerator {
       managementTasklistAuth.setResourceId("tasklist");
       managementTasklistAuth.setResource(APPLICATION);
       authorizationService.saveAuthorization(managementTasklistAuth);
+	  
+		Authorization salesCockpitAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+		salesCockpitAuth.setGroupId("sales");
+		salesCockpitAuth.addPermission(ACCESS);
+		salesCockpitAuth.setResourceId("cockpit");
+		salesCockpitAuth.setResource(APPLICATION);
+		authorizationService.saveAuthorization(salesCockpitAuth);
+
+		Authorization accountingCockpitAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+		accountingCockpitAuth.setGroupId("accounting");
+		accountingCockpitAuth.addPermission(ACCESS);
+		accountingCockpitAuth.setResourceId("cockpit");
+		accountingCockpitAuth.setResource(APPLICATION);
+		authorizationService.saveAuthorization(accountingCockpitAuth);
 
       Authorization salesDemoAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       salesDemoAuth.setGroupId("sales");
